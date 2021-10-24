@@ -2,6 +2,7 @@
 Copyright  2021 All rights reserved by Edussm Inc.
 """
 import os
+from os import path
 
 ETC = "/etc/"
 APACHE_SERVER = "/etc/httpd"
@@ -27,6 +28,11 @@ class tools:
       f.write(content)
       f.close()
       return True
+
+   def remove_file(self, filename):
+      os.remove(filename);
+      return 1
+      
 
 class operations(tools):
 
@@ -139,6 +145,26 @@ class operations(tools):
       print("working...")
       self.execute(f"ls -lZ {WEB_ROOT+selected_domain}/{subdomain_name}/log")
       print("Successfully added subdomain")
+
+   def remove_domain(self):
+      self.execute("clear")
+      print(" Please choose a domain: ")
+      domains = self.get_domains()
+      i = 1
+      for domain in domains:
+         print(" "+str(i)+". "+domain)
+         i += 1
+      get_domain = input(" Domain No>>> ")
+      get_domain = int(get_domain) - 1
+      selected_domain = domains[get_domain]
+      confirm = input("Are you sure to delete this domain?(y/n) ")
+      if confirm == "y":
+         print("Removing domain...")
+         self.execute(f"sudo rm -f {SITES_AVAILABLE+selected_domain}.conf")
+         self.execute(f"sudo rm -f {SITES_ENABLED+selected_domain}.conf")
+         print(f" `{selected_domain}` domain removed successfully !!")
+      else:
+         self.remove_domain()
             
 
 
@@ -152,6 +178,7 @@ class views(operations):
       1.Add Domain
       2.Create Subdomain
       3.View Domains
+      4.remove domain
 
       0 FOR BACK
       00 FOR GO HOME
@@ -169,6 +196,8 @@ class views(operations):
          self.subdomain_creating()
       elif COMMAND  == "3":
          self.view_domains()
+      elif COMMAND == "4":
+         self.remove_domain()
 
    def subdomain_creating(self):
       self.execute("clear")
