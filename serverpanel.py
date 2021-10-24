@@ -69,7 +69,7 @@ class operations(tools):
       print("working...")
       self.execute(f"sudo systemctl restart httpd")
       print("working...")
-      self.execute(f"ls -lZ /var/www/edussm.xyz/log")
+      self.execute(f"ls -lZ {WEB_ROOT+domain_name}/log")
       print("Successfully added domain")
 
 
