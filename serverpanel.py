@@ -2,6 +2,8 @@
 Copyright  2021 All rights reserved by Edussm Inc.
 """
 import os
+from pprint import pprint
+import sys
 from os import path
 
 ETC = "/etc/"
@@ -35,6 +37,19 @@ class tools:
       
 
 class operations(tools):
+
+   def Setup_apache(self):
+       print("Apache server setup started....")
+       self.execute(f"sudo yum install update")
+       print("Installing httpd......")
+       self.execute(f"sudo yum install httpd")
+       print("Adding service to firewall ....")
+       self.execute(f"sudo firewall-cmd --permanent --add-service=https")
+       print("Reloading firwall")
+       self.execute(f"sudo firewall-cmd --reload")
+       print("Starting httpd....")
+       self.execute(f"sudo systemctl start httpd");
+       print("Setting success.... now run the script again to get panel and go to your ip address to access web")
 
    def create_domain_config(self,  domain_name):
       print("PLease wait adding domain..")
@@ -242,4 +257,12 @@ class serverpanel(views):
 
 if __name__ == '__main__':
    panel = serverpanel()
-   panel.run()
+   arg_len = len(sys.argv)
+   argv = sys.argv
+   if arg_len > 1:
+     i = 1
+     for item in argv:
+      if item == "setup:apache":
+        panel.Setup_apache()
+   else:
+    panel.run()
