@@ -120,6 +120,25 @@ class operations(tools):
 
       return domains
    
+   def set_proxy_server(self, proxypass, selected_domain):
+      print("PLease wait Configuring domain..")
+      domain_config = SITES_AVAILABLE+selected_domain+".conf"
+      domain_config_content = f"""
+      <VirtualHost *:80>
+         ServerName {selected_domain}
+         ServerAlias www.{selected_domain}
+         DocumentRoot {WEB_ROOT+selected_domain}/{selected_domain}/public_html
+         ErrorLog {WEB_ROOT+selected_domain}/{selected_domain}/log/error.log
+         CustomLog {WEB_ROOT+selected_domain}/{selected_domain}/log/requests.log combined
+         ProxyPreserveHost On
+         ProxyPass / {proxypass}
+         ProxyPassReverse / {proxypass}
+      </VirtualHost>
+      """
+      self.write_file(domain_config, domain_config_content)
+      print("Successfully added Proxy on: ", selected_domain)
+      print("Proxy pass: ", proxypass)
+
    def create_subdomain(self, subdomain_name, selected_domain):
       subdomain_name = subdomain_name+"."+selected_domain
       print("PLease wait adding subdomain..")
@@ -227,7 +246,42 @@ class views(operations):
       selected_domain = domains[get_domain]
       subdomain_name = input(" Subdomain name>> ")
       self.create_subdomain(subdomain_name, selected_domain)
+   
+   def setting_proxy_server(self):
+      self.execute("clear")
+      print(" Please choose a domain where you wnat to set proxy: ")
+      domains = self.get_domains()
+      i = 1
+      for domain in domains:
+         print(" "+str(i)+". "+domain)
+         i += 1
+      get_domain = input(" Domain No>>> ")
+      get_domain = int(get_domain) - 1
+      selected_domain = domains[get_domain]
+      ProxyPass = input(" Proxy Pass & Reverse (IP & PORT HERE - Example: http://127.0.0.1:8080/)>> ")
+      self.set_proxy_server(ProxyPass, selected_domain)
+   
+   def Manage_virtual_host(self):
+      self.execute("clear")
+      print("""
+      !!--Manage Virtual Host --!!
+
+      1.Set Proxy Server.
+
+      0 FOR BACK
+      00 FOR GO HOME
+      """)
+      self.get_command()
+
+      if COMMAND  == "0":
+         self.window_main()
+
+      elif COMMAND  == "00":
+         self.window_main()
+      elif COMMAND  == "1":
+         self.setting_proxy_server()
          
+      
 
 
    def window_main(self):
@@ -236,11 +290,15 @@ class views(operations):
       Welcome  to  server panel edussm
 
       1. Domain panel.
+      2. Manage Virtual Host.
       """)
       self.get_command()
 
       if COMMAND == "1":
          self.domain_panel()
+      elif COMMAND == "2":
+         self.Manage_virtual_host()
+         pass
       
 
 class serverpanel(views):
