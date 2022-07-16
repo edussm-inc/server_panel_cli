@@ -136,6 +136,7 @@ class operations(tools):
       </VirtualHost>
       """
       self.write_file(domain_config, domain_config_content)
+      self.execute(f"sudo systemctl restart httpd")
       print("Successfully added Proxy on: ", selected_domain)
       print("Proxy pass: ", proxypass)
 
