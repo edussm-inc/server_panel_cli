@@ -127,9 +127,8 @@ class operations(tools):
       <VirtualHost *:80>
          ServerName {selected_domain}
          ServerAlias www.{selected_domain}
-         DocumentRoot {WEB_ROOT+selected_domain}/{selected_domain}/public_html
-         ErrorLog {WEB_ROOT+selected_domain}/{selected_domain}/log/error.log
-         CustomLog {WEB_ROOT+selected_domain}/{selected_domain}/log/requests.log combined
+         ErrorLog {WEB_ROOT+selected_domain}/log/error.log
+         CustomLog {WEB_ROOT+selected_domain}/log/requests.log combined
          ProxyPreserveHost On
          ProxyPass / {proxypass}
          ProxyPassReverse / {proxypass}
