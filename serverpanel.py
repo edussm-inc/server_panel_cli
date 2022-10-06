@@ -48,7 +48,8 @@ class operations(tools):
        print("Reloading firwall")
        self.execute(f"sudo firewall-cmd --reload")
        print("Starting httpd....")
-       self.execute(f"sudo systemctl start httpd");
+       self.execute(f"sudo systemctl start httpd")
+       self.execute(f"sudo mkdir {SITES_AVAILABLE} {SITES_ENABLED}")
        print("Setting success.... now run the script again to get panel and go to your ip address to access web")
 
    def create_domain_config(self,  domain_name):
