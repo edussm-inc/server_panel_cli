@@ -122,23 +122,48 @@ class operations(tools):
       return domains
    
    def set_proxy_server(self, proxypass, selected_domain):
-      print("PLease wait Configuring domain..")
-      domain_config = SITES_AVAILABLE+selected_domain+".conf"
-      domain_config_content = f"""
-      <VirtualHost *:80>
-         ServerName {selected_domain}
-         ServerAlias www.{selected_domain}
-         ErrorLog {WEB_ROOT+selected_domain}/log/error.log
-         CustomLog {WEB_ROOT+selected_domain}/log/requests.log combined
-         ProxyPreserveHost On
-         ProxyPass / {proxypass}
-         ProxyPassReverse / {proxypass}
-      </VirtualHost>
-      """
-      self.write_file(domain_config, domain_config_content)
-      self.execute(f"sudo systemctl restart httpd")
-      print("Successfully added Proxy on: ", selected_domain)
-      print("Proxy pass: ", proxypass)
+       print("Please wait Configuring domain...")
+   
+       # Check if the selected_domain contains a subdomain (more than one dot)
+       if selected_domain.count('.') > 1:
+           # Extract the root domain
+           rootdomain = '.'.join(selected_domain.split('.')[1:])
+       else:
+           # If no subdomain, root domain is the same as selected_domain
+           rootdomain = ""
+   
+       # Determine the configuration paths based on whether a subdomain is present
+       if rootdomain:
+           error_log_path = f"{WEB_ROOT}{rootdomain}/{selected_domain}/log/error.log"
+           custom_log_path = f"{WEB_ROOT}{rootdomain}/{selected_domain}/log/requests.log"
+       else:
+           error_log_path = f"{WEB_ROOT}{selected_domain}/log/error.log"
+           custom_log_path = f"{WEB_ROOT}{selected_domain}/log/requests.log"
+   
+       # Prepare the domain configuration content
+       domain_config = SITES_AVAILABLE + selected_domain + ".conf"
+       domain_config_content = f"""
+       <VirtualHost *:80>
+           ServerName {selected_domain}
+           ServerAlias www.{selected_domain}
+           ErrorLog {error_log_path}
+           CustomLog {custom_log_path} combined
+           ProxyPreserveHost On
+           ProxyPass / {proxypass}
+           ProxyPassReverse / {proxypass}
+       </VirtualHost>
+       """
+   
+       # Write the configuration file
+       self.write_file(domain_config, domain_config_content)
+   
+       # Restart the web server
+       self.execute("sudo systemctl restart httpd")
+   
+       # Print success messages
+       print("Successfully added Proxy on:", selected_domain)
+       print("Proxy pass:", proxypass)
+
 
    def create_subdomain(self, subdomain_name, selected_domain):
       subdomain_name = subdomain_name+"."+selected_domain
